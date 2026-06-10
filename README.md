@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>몽글몽글 마음 사전 🎈</title>
+    <!-- Tailwind CSS for modern responsive utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Jua & Nanum Gothic for friendly kid-oriented typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for cute icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            background-color: #f0f7ff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .title-font {
+            font-family: 'Jua', sans-serif;
+        }
+        /* Custom scrollbar for friendly look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Touch target improvements */
+        button, input, textarea {
+            touch-action: manipulation;
+        }
+        /* Print Styles for the worksheet */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased select-none">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white border-b border-sky-100 shadow-sm sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                <div class="bg-gradient-to-tr from-pink-400 to-yellow-300 w-12 h-12 rounded-full flex items-center justify-center shadow-md animate-bounce">
+                    <span class="text-2xl">🎈</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl title-font text-sky-600 tracking-wider">몽글몽글 마음 사전</h1>
+                    <p class="text-xs sm:text-sm text-slate-400 font-bold">감정의 이름을 알고 예쁘게 말해보아요!</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <!-- App download/add instruction guide button -->
+                <button onclick="openAppGuideModal()" class="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold px-3 py-2 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm text-xs sm:text-sm">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>스마트폰 앱 추가 방법</span>
+                </button>
+                <!-- QR Code button -->
+                <button onclick="openQrModal()" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-bold px-3 py-2 rounded-2xl transition-all flex items-center gap-1.5 shadow-sm text-xs sm:text-sm">
+                    <i class="fa-solid fa-qrcode text-lg"></i>
+                    <span>학생 접속 QR 코드</span>
+                </button>
+                <button onclick="openHelpModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-2xl transition-all flex items-center gap-1.5 text-xs sm:text-sm">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>도움말</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6 no-print">
+        
+        <!-- Left Column: Word List and Filters -->
+        <section class="w-full lg:w-7/12 flex flex-col gap-4">
+            
+            <!-- Dynamic Simple Welcome & Instruction Banner -->
+            <div class="bg-gradient-to-r from-sky-400 to-indigo-500 rounded-3xl p-6 text-white shadow-md text-center">
+                <h2 class="text-xl sm:text-2xl title-font font-bold mb-1.5">👇 아래 단어를 클릭해서 뜻을 알아봅시다! 🎈</h2>
+                <p class="text-xs sm:text-sm text-sky-100 font-medium">단어 버튼을 누르면 마음이가 말풍선으로 다정하게 설명해 줄게요.</p>
+            </div>
+
+            <!-- Category Filter Tags -->
+            <div class="bg-white rounded-3xl p-5 border border-sky-100 shadow-md">
+                <div class="flex flex-wrap gap-2 items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wide mr-1"><i class="fa-solid fa-tags"></i> 마음 모둠:</span>
+                    <button onclick="filterCategory('all')" id="cat-all" class="cat-btn active bg-sky-500 text-white font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        전체 보기 🌈
+                    </button>
+                    <button onclick="filterCategory('joy')" id="cat-joy" class="cat-btn bg-white hover:bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        기쁨/뿌듯 😊
+                    </button>
+                    <button onclick="filterCategory('sad')" id="cat-sad" class="cat-btn bg-white hover:bg-blue-50 border border-blue-200 text-blue-700 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        슬픔/속상 😢
+                    </button>
+                    <button onclick="filterCategory('angry')" id="cat-angry" class="cat-btn bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        화남/억울 😡
+                    </button>
+                    <button onclick="filterCategory('scared')" id="cat-scared" class="cat-btn bg-white hover:bg-amber-50 border border-amber-200 text-amber-700 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        불안/두렴 😨
+                    </button>
+                    <button onclick="filterCategory('love')" id="cat-love" class="cat-btn bg-white hover:bg-pink-50 border border-pink-200 text-pink-700 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        사랑/따뜻 💕
+                    </button>
+                    <button onclick="filterCategory('confused')" id="cat-confused" class="cat-btn bg-white hover:bg-purple-50 border border-purple-200 text-purple-700 font-bold px-3 py-1.5 rounded-xl text-xs sm:text-sm transition-all shadow-sm">
+                        기타/복잡 🤔
+                    </button>
+                </div>
+            </div>
+
+            <!-- Emotion Grid Panel -->
+            <div class="bg-white rounded-3xl p-5 border border-sky-100 shadow-md flex-grow flex flex-col min-h-[400px]">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                    <span class="font-bold text-slate-600 text-sm sm:text-base">
+                        <i class="fa-solid fa-heart text-rose-500 mr-1 animate-pulse"></i>
+                        단어 모음 (<span id="word-count" class="text-sky-600 font-black">79</span>개)
+                    </span>
+                    <span class="text-xs text-slate-400 font-bold hidden sm:inline">정사각형 버튼을 클릭해 보세요!</span>
+                </div>
+
+                <!-- Word Buttons Grid Container -->
+                <div id="wordGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 overflow-y-auto max-h-[500px] lg:max-h-[600px] pr-2">
+                    <!-- Word cards will be loaded dynamically via Javascript -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden flex-col items-center justify-center text-center p-8 flex-grow">
+                    <span class="text-5xl mb-3">🌈</span>
+                    <h3 class="text-lg font-bold text-slate-600">불러오는 중입니다...</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Speech Bubble, Character "Maumi", and Custom Worksheet -->
+        <section class="w-full lg:w-5/12 flex flex-col gap-6">
+            
+            <!-- Character Speech Bubble Area -->
+            <div class="bg-gradient-to-br from-sky-50 to-indigo-50 rounded-3xl p-6 border border-sky-100 shadow-md flex flex-col items-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-sky-200/20 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <!-- Bubble Header -->
+                <div class="w-full flex justify-between items-center mb-4">
+                    <span class="bg-white/80 backdrop-blur text-sky-700 text-xs px-3 py-1 rounded-full font-bold shadow-sm border border-sky-100">
+                        귀여운 친구 '마음이'와 대화해봐요!
+                    </span>
+                    <button onclick="readAloudActiveWord()" id="speakerBtn" class="bg-sky-500 hover:bg-sky-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-all active:scale-95 text-lg" title="소리로 들려줄게!">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                </div>
+
+                <!-- Bubble Container -->
+                <div class="w-full relative mb-6">
+                    <!-- Speech Bubble Tail -->
+                    <div class="absolute bottom-[-15px] left-1/2 transform -translate-x-1/2 w-6 h-6 bg-white rotate-45 border-r border-b border-slate-100 shadow-md"></div>
+                    
+                    <!-- Bubble Content Card -->
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg text-slate-700 min-h-[160px] flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span id="bubbleEmoji" class="text-3xl animate-bounce">🤗</span>
+                                <h2 id="bubbleWord" class="text-2xl title-font text-sky-600">안녕! 반가워</h2>
+                            </div>
+                            <p id="bubbleDefinition" class="text-base font-bold leading-relaxed text-slate-600">
+                                아래 단어 중에서 너의 마음에 와닿는 단어를 클릭해 봐! 그 단어가 무슨 뜻인지 친절하게 설명해 줄게.
+                            </p>
+                        </div>
+                        <div class="mt-4 border-t border-dashed border-slate-100 pt-3">
+                            <span class="text-xs font-bold text-sky-500 uppercase block tracking-wider mb-1">💡 예문으로 느끼기</span>
+                            <p id="bubbleExample" class="text-sm text-slate-500 italic">
+                                "오늘 내 마음은 어떤 모양일까?" 궁금할 때는 마음 사전이 필요해!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Character (Maumi SVG) -->
+                <div class="flex flex-col items-center gap-2">
+                    <div id="characterWrapper" class="w-24 h-24 transition-transform hover:scale-110 duration-300">
+                        <!-- SVG Face rendered dynamically in JS -->
+                    </div>
+                    <span id="characterLabel" class="text-xs font-bold text-slate-500 bg-white px-2.5 py-1 rounded-full border border-slate-100 shadow-sm">마음이의 기분: 설렘</span>
+                </div>
+            </div>
+
+            <!-- My Heart Worksheet Creator -->
+            <div class="bg-white rounded-3xl p-6 border border-sky-100 shadow-md flex flex-col gap-4">
+                <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                    <h3 class="font-bold text-slate-700 flex items-center gap-2 text-base sm:text-lg">
+                        <span class="text-2xl">📝</span>
+                        <span>나만의 마음 사전 만들기</span>
+                    </h3>
+                    <span class="text-xs text-indigo-500 font-bold bg-indigo-50 px-2.5 py-1 rounded-full">수업 학습지</span>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">1. 마음 사전에서 선택한 단어</label>
+                        <input type="text" id="wsWord" readonly placeholder="위에서 단어를 클릭하면 자동으로 쏙 들어가요" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-bold outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">2. 이 감정을 느껴본 순간 (나만의 경험)</label>
+                        <textarea id="wsReason" rows="2" placeholder="예: 친구가 나에게 먼저 인사를 건네며 미안하다고 말해 주었을 때..." class="w-full px-4 py-3 border border-slate-200 focus:border-indigo-400 rounded-xl outline-none text-sm transition-all text-slate-600 placeholder-slate-400 resize-none font-bold"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">3. 내가 직접 만드는 예쁜 예문</label>
+                        <input type="text" id="wsExample" placeholder="예: 친구의 따뜻한 사과 덕분에 가슴이 후련해졌어." class="w-full px-4 py-2 border border-slate-200 focus:border-indigo-400 rounded-xl outline-none text-sm transition-all text-slate-600 font-bold placeholder-slate-400">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="saveToWorksheet()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>활동지에 추가</span>
+                        </button>
+                        <button onclick="clearWorksheet()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-2xl transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>모두 초기화</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Printable Worksheet Frame (Hidden on Web Screen, Shown on Print) -->
+    <section id="print-area" class="hidden p-8 max-w-4xl mx-auto bg-white border-2 border-slate-300 rounded-3xl my-10 flex-col gap-6 font-sans">
+        <!-- Print Header -->
+        <div class="border-b-4 border-double border-indigo-600 pb-4 text-center">
+            <h1 class="text-4xl title-font text-indigo-600 font-extrabold mb-1">🎈 몽글몽글 마음 사전 워크시트 📝</h1>
+            <p class="text-base text-slate-500">내가 찾아보고 직접 만든 멋진 마음 사전을 자랑해 보아요!</p>
+        </div>
+
+        <!-- Student ID Row -->
+        <div class="grid grid-cols-3 gap-4 border border-slate-300 p-4 rounded-xl text-center bg-slate-50 font-bold text-lg text-slate-700">
+            <div>학년: ____학년 ____반</div>
+            <div>번호: ______번</div>
+            <div>이름: ______________</div>
+        </div>
+
+        <!-- Saved Words Display Section -->
+        <div class="flex-grow flex flex-col gap-6">
+            <h2 class="text-2xl font-bold text-slate-800 border-l-4 border-indigo-500 pl-3">내가 마음에 새긴 감정 단어들</h2>
+            <div id="printWordsList" class="grid grid-cols-1 gap-4">
+                <div class="text-center text-slate-400 py-10 font-bold border border-dashed border-slate-300 rounded-xl">
+                    오른쪽 패널에서 "활동지에 추가" 버튼을 눌러 단어를 기록해 주세요!
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-4 text-center text-xs text-slate-400">
+            <span>마음 사전 만들기 학습 자료 | 몽글몽글 마음 사전 시스템</span>
+        </div>
+    </section>
+
+    <!-- Floating Worksheet Preview / Print bar -->
+    <div id="worksheetBar" class="fixed bottom-0 left-0 right-0 bg-white border-t border-indigo-100 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] p-4 flex items-center justify-between px-6 z-30 no-print hidden animate-slide-up">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-100 text-indigo-700 w-10 h-10 rounded-full flex items-center justify-center text-xl">
+                📝
+            </div>
+            <div>
+                <p class="font-bold text-sm sm:text-base text-slate-800">나만의 마음 기록지 작성이 시작되었습니다!</p>
+                <p class="text-xs text-slate-400">현재 <span id="savedCount" class="text-indigo-600 font-bold">0</span>개의 단어가 담겨 있어요.</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="previewAndPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-2xl shadow-md transition-all text-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-print"></i>
+                <span>내 학습지 인쇄 / PDF 저장</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- QR Access Code Modal -->
+    <div id="qrModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl transform scale-95 transition-all duration-300">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-xl title-font text-indigo-700 flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode"></i>
+                    <span>학생 기기 자동 접속 QR</span>
+                </h3>
+                <button onclick="closeQrModal()" class="text-slate-400 hover:text-slate-600 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-col items-center gap-4 text-center py-2">
+                <p class="text-sm font-bold text-slate-500 leading-relaxed">
+                    선생님이 공유하거나 배포한 웹 주소로 바로 가는 QR 코드입니다. 스마트폰/태블릿 카메라로 스캔하면 제미나이 없이 바로 앱이 켜집니다!
+                </p>
+                
+                <!-- Dynamic QR display container -->
+                <div class="bg-slate-50 p-4 border-2 border-dashed border-indigo-200 rounded-2xl relative">
+                    <img id="qrImage" src="" alt="Student Access QR" class="w-48 h-48 block shadow-sm rounded-lg">
+                </div>
+
+                <!-- Custom URL input helper for teachers -->
+                <div class="w-full">
+                    <label class="block text-xs text-slate-400 font-bold text-left mb-1">학생들이 접속할 웹 주소:</label>
+                    <div class="flex gap-1.5">
+                        <input type="text" id="qrCustomUrl" oninput="updateQrCode()" class="flex-grow border-2 border-slate-200 focus:border-indigo-400 px-3 py-1.5 rounded-xl text-xs outline-none font-sans font-bold text-slate-600" placeholder="출판하신 링크가 자동으로 들어갑니다">
+                        <button onclick="copyCurrentUrl()" class="bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>복사</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 text-amber-800 text-xs p-3 rounded-xl border border-amber-100 mt-1 text-left">
+                    <i class="fa-solid fa-circle-info mr-1"></i>
+                    <span><strong>안내:</strong> 현재 화면을 전자칠판에 크게 띄우면 학생들이 교실 자리에서 편하게 스캔하여 개별 스마트 패드로 탐색할 수 있습니다.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart App Guide Modal -->
+    <div id="appGuideModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl transform scale-95 transition-all duration-300">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-lg title-font text-emerald-700 flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>진짜 스마트폰 앱처럼 사용하기</span>
+                </h3>
+                <button onclick="closeAppGuideModal()" class="text-slate-400 hover:text-slate-600 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="text-slate-600 text-sm leading-relaxed flex flex-col gap-4 py-2 font-bold">
+                <p class="text-xs text-slate-400 font-normal">학생들 폰이나 패드 바탕화면에 바로가기 앱을 만들면 언제든 편리하게 실행할 수 있습니다.</p>
+                <div>
+                    <h4 class="text-emerald-700 text-sm mb-1">🍎 아이폰 (Safari 브라우저)</h4>
+                    <p class="font-normal text-slate-600">1. 아래쪽의 <strong class="text-emerald-600">[공유]</strong> 버튼을 누릅니다.<br>2. 목록에서 <strong class="text-emerald-600">[홈 화면에 추가]</strong>를 누릅니다.</p>
+                </div>
+                <div>
+                    <h4 class="text-emerald-700 text-sm mb-1">🤖 안드로이드 갤럭시 (Chrome / 삼성 브라우저)</h4>
+                    <p class="font-normal text-slate-600">1. 우측 상단 혹은 하단의 <strong class="text-emerald-600">[더보기 (점 3개/줄 3개)]</strong> 메뉴를 누릅니다.<br>2. <strong class="text-emerald-600">[홈 화면에 추가]</strong> 혹은 <strong class="text-emerald-600">[앱 설치]</strong>를 누릅니다.</p>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 text-right">
+                <button onclick="closeAppGuideModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-5 py-2 rounded-2xl transition-all text-xs">확인했습니다</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl transform scale-95 transition-all duration-300">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h3 class="text-xl title-font text-sky-700 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>마음 사전 사용설명서</span>
+                </h3>
+                <button onclick="closeHelpModal()" class="text-slate-400 hover:text-slate-600 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="text-slate-600 text-sm leading-relaxed flex flex-col gap-4 py-2">
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1">💡 1단계: 마음 사전에서 클릭하기</h4>
+                    <p>79가지 다양한 감정 단어들이 준비되어 있습니다. 모둠 단추를 눌러서 카테고리별로 감정을 살펴보고, 알아보고 싶은 감정을 클릭하세요.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1">🗣️ 2단계: 말풍선 소리 듣기</h4>
+                    <p>단어를 누르면 '마음이' 말풍선에 귀여운 예문과 쉽고 명확한 뜻풀이가 나타납니다. 위쪽의 <i class="fa-solid fa-volume-high text-sky-500"></i> 버튼을 누르면 인공지능 보이스로 글을 직접 읽어줘요.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1">📝 3단계: 나만의 감정 학습지 제작</h4>
+                    <p>뜻을 배운 뒤, 아래의 칸에 내가 언제 그런 마음을 느꼈는지 이유와 나만의 멋진 예문을 하나 적어서 "활동지에 추가"를 눌러보세요. 나중에 한 장의 학습지로 인쇄해 보관할 수 있습니다.</p>
+                </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 text-right">
+                <button onclick="closeHelpModal()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold px-5 py-2 rounded-2xl transition-all">확인했습니다!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Javascript Logical Modules -->
+    <script>
+        // Dictionary dataset with 79 requested words + child-friendly definitions, category, matching expressions, and examples
+        const EMOTION_DICTIONARY = [
+            { word: "감격스럽다", cat: "joy", emoji: "🥺", face: "happy-tear", def: "마음속 깊이 크게 감동하여 가슴이 기쁨으로 가득 차오르는 느낌이에요.", ex: "마지막 역전 결승 골을 넣었을 때 가슴이 벅차고 감격스러웠어요." },
+            { word: "따분하다", cat: "confused", emoji: "🥱", face: "bored", def: "할 일도 없고 재미있는 것도 전혀 없어서 지루하고 따분한 기분이에요.", ex: "비가 와서 밖에도 못 나가고 집에서 누워만 있으니 하루 종일 따분해요." },
+            { word: "사랑하다", cat: "love", emoji: "💕", face: "love", def: "누군가를 아주 많이 아끼고 소중히 여겨 언제나 잘해주고 싶은 깊은 애정의 마음이에요.", ex: "엄마와 아빠가 활짝 웃으며 나를 꼬옥 안아주실 때 무척 사랑하는 것을 느껴요." },
+            { word: "어이없다", cat: "confused", emoji: "🙄", face: "shocked", def: "너무 상상치 못한 엉뚱하고 황당한 일이 일어나 기가 막혀 말이 나오지 않는 기분이에요.", ex: "내가 먹으려던 딸기를 강아지가 꿀꺽 한 입에 가로채서 어이없게 웃음이 났어요." },
+            { word: "걱정스럽다", cat: "scared", emoji: "😟", face: "scared", def: "앞으로 무언가 안 좋은 일이나 실수가 생기지 않을까 마음을 졸이며 안절부절못하는 것이에요.", ex: "내일 발표 수업을 잘 해낼 수 있을지 가슴이 쿵쾅거리고 자꾸 걱정스러워요." },
+            { word: "무겁다", cat: "sad", emoji: "😔", face: "sad", def: "잘못한 일이 있거나 속상한 일 때문에 가라앉아서 활기를 잃은 답답한 상태예요.", ex: "어제 친구에게 큰 소리로 심술을 부린 후 마음 한편이 무거워서 웅크려 있었어요." },
+            { word: "산뜻하다", cat: "joy", emoji: "🍃", face: "happy", def: "기분이나 온몸의 느낌이 한결 깨끗하고 상큼해서 기운이 가벼워지는 느낌이에요.", ex: "아침 햇살을 맞으며 이 닦기와 세수를 하고 나니 기분이 아주 산뜻해졌어요." },
+            { word: "억울하다", cat: "angry", emoji: "😭", face: "angry", def: "나는 잘못한 것이 전혀 없는데 억울하게 오해를 받거나 누명을 써서 무척 분한 느낌이에요.", ex: "내가 깨뜨린 유리컵이 아닌데 동생의 잘못을 다 뒤집어써서 억울하고 서러워요." },
+            { word: "고맙다", cat: "love", emoji: "💖", face: "love", def: "다른 사람의 친절이나 큰 도움을 받았을 때 마음 깊은 감사와 감동이 전해지는 것이에요.", ex: "내가 아파서 학교에 안 나왔을 때 숙제를 정성껏 챙겨준 단짝에게 정말 고마웠어요." },
+            { word: "무섭다", cat: "scared", emoji: "👻", face: "scared", def: "내게 무서운 물건이나 두려운 상황이 닥쳐 당장 달아나거나 피하고 싶은 아찔한 기분이에요.", ex: "방 안의 형광등 불이 꺼지고 밖에서 천둥번개가 칠 때 가슴속이 울리며 무서웠어요." },
+            { word: "상쾌하다", cat: "joy", emoji: "🌿", face: "happy", def: "몸과 마음이 무척 가뿐하고 상큼해서 기분이 하늘을 날 듯이 가벼워지는 느낌이에요.", ex: "창문을 활짝 열고 아침의 깨끗한 산들바람을 한가득 들이마시니 상쾌해요." },
+            { word: "얼떨떨하다", cat: "confused", emoji: "🌀", face: "shocked", def: "전혀 예상치 못한 갑작스러운 일을 겪어 머릿속이 멍하고 갈피를 잡을 수 없는 상태예요.", ex: "우리 반 반장으로 내 이름이 불렸을 때 어안이 벙벙하고 기분이 얼떨떨했어요." },
+            { word: "괜찮다", cat: "joy", emoji: "👌", face: "happy", def: "특별히 문제 되거나 나쁜 점이 없이 안심해도 되고 아무 이상 없는 평온한 상태예요.", ex: "달리기 시합 중 넘어져 무릎이 약간 따끔거렸지만, 툭툭 털고 일어나니 괜찮았어요." },
+            { word: "미안하다", cat: "sad", emoji: "🥺", face: "sad", def: "내가 한 잘못이나 실수로 다른 사람의 기분을 불쾌하게 만들어 몹시 마음에 미안한 느낌이에요.", ex: "체육 시간에 실수로 친구의 발을 힘껏 밟아서 미안한 생각에 자꾸 안절부절못했어요." },
+            { word: "상큼하다", cat: "joy", emoji: "🍊", face: "happy", def: "싱그럽고 활기찬 신선함이 넘쳐흘러서 기분이 톡 쏘듯 생기가 가득 차오르는 상태예요.", ex: "비타민 가득한 시원한 오렌지 주스 한 모금을 마시니 입안과 마음이 상큼해졌어요." },
+            { word: "예쁘다", cat: "love", emoji: "🌻", face: "love", def: "보기에 아주 사랑스럽고 소중하여 얼굴에 해맑은 웃음이 저절로 띄어지는 아름다운 감정이에요.", ex: "들판에 옹기종기 모여 피어있는 작고 귀여운 노란 꽃들의 모습이 참 예뻐 보여요." },
+            { word: "괴롭다", cat: "sad", emoji: "🤕", face: "sad", def: "몸의 상처나 마음의 큰 걱정 때문에 감당하기가 몹시 고되고 참기 아픈 괴로운 기분이에요.", ex: "열심히 준비한 미술 작품을 실수로 잃어버려서 하루 종일 괴롭고 우울했어요." },
+            { word: "밉다", cat: "angry", emoji: "😠", face: "angry", def: "상대방의 미운 행동이나 말투가 무척 마음에 들지 않아 가깝게 지내고 싶지 않은 불쾌함이에요.", ex: "친구들의 소중한 책에 멋대로 낙서를 해 버리는 짝꿍의 모습이 무척 얄밉고 미웠어요." },
+            { word: "서럽다", cat: "sad", emoji: "😢", face: "sad", def: "억울하고 슬픈 상황인데 아무도 나를 공감해 주거나 이해해 주지 않아 눈물이 흘러내리는 기분이에요.", ex: "언니와 오빠 위주로만 간식을 나누어 주는 부모님의 모습에 순간 서럽고 눈물이 났어요." },
+            { word: "외롭다", cat: "sad", emoji: "🌪️", face: "sad", def: "아무도 내 곁에 없거나 홀로 버려진 기분이 들어 마음 가득 찬바람이 부는 것처럼 쓸쓸해지는 것입니다.", ex: "비가 오던 주말 오후, 놀 사람도 없이 덩그러니 거실에 홀로 앉아 있으니 정말 외로웠어요." },
+            { word: "궁금하다", cat: "confused", emoji: "🕵️", face: "shocked", def: "아직 알지 못하는 새로운 소식이나 숨은 사실이 알고 싶어서 안절부절못하고 가슴 뛰는 상태예요.", ex: "선생님이 주시는 알림장 속 '내일 깜짝 준비물'이 무엇일지 너무 궁금해서 호기심이 일었어요." },
+            { word: "반갑다", cat: "love", emoji: "👋", face: "happy", def: "한동안 만나지 못해 그리워하던 소중한 사람을 우연히 다시 만나 기쁘고 신이 나는 기분이에요.", ex: "이사 간 단짝 친구가 깜짝 이벤트로 우리 집에 놀러 오자 가슴 벅차도록 반가웠어요." },
+            { word: "설레다", cat: "joy", emoji: "💓", face: "love", def: "앞으로 일어날 재미있거나 행복한 일을 무척 기대하며 심장이 두근두근 속삭이는 유쾌한 기분이에요.", ex: "드디어 내일 가족들과 함께 비행기를 타고 제주도로 긴 소풍을 떠난다는 소식에 설레요." },
+            { word: "용감하다", cat: "love", emoji: "🦁", face: "happy", def: "두려운 상황이 닥쳐도 겁을 먹고 뒤로 물러서지 않고 마음을 단단히 먹고 씩씩하게 일어서는 상태예요.", ex: "괴롭힘을 당하며 눈물을 훔치는 약한 친구를 구하기 위해 담대하게 나섰던 용감한 나예요." },
+            { word: "귀엽다", cat: "love", emoji: "🐾", face: "love", def: "작고 아기자기하며 예쁘고 사랑스러워서 품에 쏙 껴안고 예뻐해 주고 싶은 따스한 감정이에요.", ex: "발을 동동 구르며 애교 섞인 소리로 간식을 달라는 아기 햄스터가 너무나도 귀여워요." },
+            { word: "벅차다", cat: "joy", emoji: "🌊", face: "happy-tear", def: "기쁨이나 감동의 파도가 가슴속으로 가득 들어차서 숨이 멎을 듯 감격적인 흥분 상태를 말해요.", ex: "오랫동안 매일매일 포기하지 않고 연습한 동요 부르기 대회에서 영광의 대상을 타자 가슴이 벅찼어요." },
+            { word: "속상하다", cat: "angry", emoji: "💔", face: "angry", def: "내가 바랐던 일이나 결과대로 풀리지 않아 속이 상하고 화와 속이 아리고 슬픈 상태예요.", ex: "열심히 공부하여 준비했던 한자 시험이었는데 한 문제를 아깝게 틀려서 내심 무척 속상했어요." },
+            { word: "우습다", cat: "joy", emoji: "😄", face: "happy", def: "상황이나 사람의 우스꽝스러운 농담을 접하여 나도 모르게 하하하 밝은 웃음이 터져 나오는 기분이에요.", ex: "아빠가 재미있는 짱구 얼굴 가면을 쓰고 엉덩이춤을 유쾌하게 추시는 것을 보고 우스웠어요." },
+            { word: "그립다", cat: "love", emoji: "🌅", face: "sad", def: "과거의 아름다운 추억이나 지금 멀리 있는 소중한 대상을 간절히 보고 싶어 마음에 품는 것입니다.", ex: "멀리 계시는 친할머니 댁의 푸근한 미소와 구수한 된장찌개 맛이 찬바람 불 때면 자꾸만 그리워요." },
+            { word: "보고싶다", cat: "love", emoji: "👁️", face: "love", def: "얼굴을 마음 깊이 떠올리며 당장 만나서 서로 이야기하고 어울리고 싶은 간절한 소망이에요.", ex: "훈련하러 멀리 떠나 일주일 동안이나 보지 못한 형아가 보고 싶어서 전화를 꾹 꾹 눌러 걸었어요." },
+            { word: "슬프다", cat: "sad", emoji: "😭", face: "sad", def: "마음속에 큰 상처나 아픔이 있어 주룩주룩 눈물이 날 것 같고 가슴이 슬프고 에이는 느낌이에요.", ex: "아기 때부터 기르던 작은 흰색 물고기 보들이가 더 이상 헤엄치지 않고 하늘로 갔을 때 정말 슬펐어요." },
+            { word: "울적하다", cat: "sad", emoji: "🌧️", face: "sad", def: "이유 없이 기분이 가라앉아 맑은 미소가 지어지지 않고 눈가에 눈물이 맺힐 듯 우울한 느낌이에요.", ex: "하늘에 먹구름이 가득 차고 축축한 가을비가 그치지 않고 종일 내리는 날에는 괜스레 울적해져요." },
+            { word: "기쁘다", cat: "joy", emoji: "🎉", face: "happy", def: "바라던 바가 이루어지거나 흐뭇하고 자랑스러워 기분이 최고조에 도달해 뛸 듯이 좋은 느낌이에요.", ex: "산타 할아버지께 간절히 바라던 로봇 장난감을 크리스마스 머리맡 선물로 찾아냈을 때 정말 기뻤어요." },
+            { word: "부끄럽다", cat: "confused", emoji: "😳", face: "shocked", def: "남에게 보이기 부끄러운 실수를 저질렀거나, 칭찬에 귀가 붉어지고 수줍은 조심스러운 마음이에요.", ex: "여러 사람 앞에서 잘했다고 선생님께 칭찬을 한가득 받으니 수줍고 부끄워 발끝만 보았어요." },
+            { word: "신기하다", cat: "confused", emoji: "🔮", face: "shocked", def: "일상에서 쉽게 볼 수 없는 놀라운 일이 눈앞에 펼쳐져 호기심이 무척 일어나고 신통방통한 느낌이에요.", ex: "마술사가 모자 속에서 끊임없이 하얀 비둘기를 꺼내 날리는 광경은 볼 때마다 늘 신기해요." },
+            { word: "원망스럽다", cat: "angry", emoji: "🥺", face: "angry", def: "상대방이 고마움을 몰라주거나 나를 나쁘게 대해 섭섭하고 미운 마음을 마음 한편에 갖는 느낌이에요.", ex: "같이 가기로 해놓고 나를 쏙 빼놓고 가 버린 내 친한 단짝 친구가 문득 야속하고 원망스러웠어요." },
+            { word: "나쁘다", cat: "angry", emoji: "👎", face: "angry", def: "착하고 착한 도덕과 행동에 어긋나며, 다른 사람의 감정에 나쁜 영향과 상처를 주는 부정적 마음이에요.", ex: "친구가 열심히 쌓아 놓은 정성 가득한 도미노 탑을 이유 없이 발로 차 부수는 것은 나쁜 행동이에요." },
+            { word: "부담스럽다", cat: "confused", emoji: "🎒", face: "bored", def: "어떤 약속이나 넘치는 선의에 책임감을 세게 느껴 마음에 짐을 얹은 것처럼 무겁고 불편한 기분이에요.", ex: "반장 선거에 내 이름을 꼭 후보로 추천하겠다는 단짝들의 열띤 부추김이 어쩐지 부담스러웠어요." },
+            { word: "신나다", cat: "joy", emoji: "🕺", face: "happy", def: "즐겁고 흥겨운 파티 분위기가 절로 무르익어 온몸이 들썩이고 기분 좋은 미소가 활짝 퍼지는 것이에요.", ex: "드디어 기다려 왔던 긴 겨울 방학이 시작되자마자 온 힘을 다해 신나게 밖으로 뛰어나갔어요." },
+            { word: "유쾌하다", cat: "joy", emoji: "😆", face: "happy", def: "속이 아주 후련하게 맑고, 소탈하고 즐거운 웃음이 넘쳐나 기분이 무척 가벼워진 최고 기분이에요.", ex: "위트가 철철 넘치는 유머러스한 삼촌의 재치 있는 몸동작을 보고 유쾌하게 웃음을 지었어요." },
+            { word: "놀라다", cat: "scared", emoji: "😮", face: "shocked", def: "전혀 상상도 하지 못한 깜짝 이벤트나 무시무시한 일을 만나 가슴이 철렁 내려앉는 긴장감이에요.", ex: "뒤에서 갑자기 손으로 내 눈을 가리며 '누구게!' 하고 큰 소리가 나서 깜짝 놀랐어요." },
+            { word: "불쌍하다", cat: "sad", emoji: "😿", face: "sad", def: "어렵고 가여운 처지에 있는 대상을 보며 그들의 마음을 도와 보듬어주고 싶고 짠한 감정이에요.", ex: "추운 바람 속에서 집도 없이 웅크려 덜덜 떨고 있는 길고양이를 마주하니 참 불쌍하고 안쓰러요." },
+            { word: "심술나다", cat: "angry", emoji: "😈", face: "angry", def: "공연히 다른 사람이 잘되는 꼴이 배 아프고 얄미워서, 장난치고 방해하고 싶은 나쁜 마음이에요.", ex: "누나가 새로 산 빛나는 학용품이 너무 탐나고 부러워서 장난감을 뺏어 숨기는 심술을 부렸어요." },
+            { word: "자랑스럽다", cat: "joy", emoji: "👑", face: "happy", def: "내가 한 멋진 성공이나 우리 반의 활약이 떳떳하고 뿌듯해서 어깨를 당당히 활짝 펴고 싶은 마음이에요.", ex: "스스로 힘겨운 수학 경시대회 문제를 풀어내어 멋진 동메달을 땄을 때 나 자신이 참 자랑스러웠어요." },
+            { word: "다행스럽다", cat: "joy", emoji: "🍀", face: "happy", def: "걱정하고 두려워했던 나쁜 일이나 위험한 상황을 피해 안도하고 한숨을 돌릴 만한 만족스러운 기분이에요.", ex: "자전거를 타다가 앞으로 넘어졌는데, 안전 헬멧을 꼭 쓴 덕분에 하나도 다치지 않아 다행스러웠어요." },
+            { word: "불안하다", cat: "scared", emoji: "😰", face: "scared", def: "마음이 한없이 불안정하여 가슴이 조마조마 떨리고 무서운 일이 터질까 염려하는 떨림의 기분이에요.", ex: "선생님 몰래 친구랑 장난 전화를 한 것이 혹시 걸리지는 않을까 수업 시간 내내 매우 불안했어요." },
+            { word: "쓸쓸하다", cat: "sad", emoji: "🍂", face: "sad", def: "친구가 전학을 갔거나 가을바람 속에 홀로 남겨진 것처럼 텅 빈 가슴이 조용해지며 아려오는 외로움이에요.", ex: "늘 같이 하교하던 단짝 친구가 학원 차를 타고 먼저 떠난 길을 홀로 걸어가니 왠지 씁쓸하고 쓸쓸했어요." },
+            { word: "정겹다", cat: "love", emoji: "🏡", face: "love", def: "오래 만나 알고 지낸 가족이나 단짝 친구처럼 눈길만 스쳐도 마음이 친숙하고 푸근하게 훈훈해지는 정이에요.", ex: "시골 마을 어귀에서 이웃 할머니들께서 서로 정성껏 부친 부침개를 나누시는 정겨운 모습을 보았어요." },
+            { word: "달콤하다", cat: "love", emoji: "🍬", face: "love", def: "솜사탕이나 초콜릿을 가득 입에 문 기분처럼 가슴이 부드고 한없이 녹아내려 사랑이 가득 찬 마음이에요.", ex: "오랜만에 온 가족이 둥글게 모여 앉아 서로 손을 잡고 좋아하는 영화를 보며 나누는 대화는 참 달콤해요." },
+            { word: "불쾌하다", cat: "angry", emoji: "😣", face: "angry", def: "상대방의 무례함이나 기분 나쁜 소리로 인해 온몸에 소름이 돋고 짜증이 나는 불유쾌한 마음이에요.", ex: "지나가는 자전거가 흙탕물을 내 새 옷에 튀겨 버린 후 사과도 없이 가 버려 무척 불쾌했어요." },
+            { word: "아프다", cat: "sad", emoji: "🤒", face: "sad", def: "넘어져 피가 나거나 마음에 상처를 받아 가슴이 쓰리고 미어지며 괴로워 눈물 나는 물리적/정신적 감정이에요.", ex: "친구들의 수군거리는 거친 장난이 모두 나를 향하고 있었다는 오해를 풀자 가슴이 쿵쾅거리고 아팠어요." },
+            { word: "조마조마 하다", cat: "scared", emoji: "⏳", face: "scared", def: "혹시라도 나쁜 일이나 실패가 올까 봐 가슴이 계속 덜덜 떨리고 숨이 막힐 듯이 조심하는 상태예요.", ex: "엄마의 소중한 수공예 화분을 내가 만지다가 기우뚱 흔들릴 때 온 마음이 덜덜 떨리고 조마조마했어요." },
+            { word: "답답하다", cat: "angry", emoji: "😫", face: "angry", def: "마치 가슴속을 솜이불로 꾹 눌러놓은 듯이 산소가 부족하고 시원하지 않아 소리를 지르고 싶은 기분이에요.", ex: "친구에게 내 억울한 사정을 빨리 설명해 주고 싶은데, 목소리가 잘 나오지 않아 가슴이 답답했어요." },
+            { word: "불편하다", cat: "angry", emoji: "🪨", face: "bored", def: "어려운 사이의 사람이나 어색한 상황에 처해 몸과 마음을 어떻게 둘지 몰라 서먹서먹하고 거북한 마음이에요.", ex: "어제 작은 장난 문제로 서먹하게 다툰 단짝 친구의 옆자리에 하루 종일 같이 앉아 있으니 마음이 불편해요." },
+            { word: "안쓰럽다", cat: "sad", emoji: "🥺", face: "sad", def: "마음속 깊이 딱하고 가여워 손을 내밀고 가벼운 위로의 말을 건네고 싶은 안타까운 동정심이에요.", ex: "다친 새 한 마리가 날아가지 못하고 땅바닥에서 파닥거리는 상처 어린 뒷모습을 볼 때 마음이 안쓰러워요." },
+            { word: "좋다", cat: "joy", emoji: "👍", face: "happy", def: "더 이상 아무런 불평불만이 없으며, 내 마음에 아주 만족스럽고 즐거운 긍정의 에너지를 뜻해요.", ex: "엄마 아빠와 함께 푸르른 넓은 잔디밭에 돗자리를 펴놓고 행복하게 뛰놀 수 있는 모든 순간이 좋아요." },
+            { word: "당황스럽다", cat: "scared", emoji: "😳", face: "shocked", def: "생각하지도 못한 난감한 난관이나 사건에 부딪혀 정신이 하얗게 비고 어쩔 줄 모르는 다급한 기분이에요.", ex: "학교 준비물이었던 공책과 필통을 교과서 서랍에 그대로 놔두고 집으로 가방만 들고 왔을 때 정말 당황스러웠어요." },
+            { word: "불행하다", cat: "sad", emoji: "🌪️", face: "sad", def: "원하는 꿈이나 즐거운 일이 모두 멀어져 마음에 기쁨이 없고 한숨만 세차게 흘러나오는 아주 불행한 상태예요.", ex: "가장 사랑하던 반려견 마루가 갑작스러운 병으로 더 이상 내 목소리에 응답해 주지 않아 불행했어요." },
+            { word: "안타깝다", cat: "sad", emoji: "😔", face: "sad", def: "도와주어 문제를 해결해 주고 싶은데도 그러지 못하는 한계 속에 안절부절못하며 발을 동동 구르는 마음이에요.", ex: "열심히 공부했는데 하필 아침에 큰 감기가 찾아와 시험을 못 보러 가게 된 짝꿍의 소식이 참 안타까워요." },
+            { word: "즐겁다", cat: "joy", emoji: "🤸", face: "happy", def: "기분이 아주 상쾌하고 기운이 넘쳐서 저절로 어깨가 으쓱이고 친구들과 웃음보가 한가득 터지는 상황이에요.", ex: "따뜻한 가을날, 친구들과 함께 넓은 운동장 구석구석을 뛰어다니며 피구를 하던 순간이 가장 즐거웠어요." },
+            { word: "두렵다", cat: "scared", emoji: "🧟", face: "scared", def: "나에게 위험하거나 깜짝 놀라 다칠 것 같아 마음속이 사정없이 덜덜 떨리는 두려움의 깊은 감정이에요.", ex: "아무도 기척을 주지 않는 깊고 캄캄한 어둠이 깔린 숲길을 홀로 찾아 헤매어 가기가 너무 두렵고 겁나요." },
+            { word: "뿌듯하다", cat: "joy", emoji: "🌟", face: "happy", def: "스스로가 땀 흘려 결실이나 큰 착한 일을 하고 보람이 가슴속 깊이 뿌듯하게 들어차는 마음이에요.", ex: "내가 모아둔 용돈을 가여운 이웃을 돕는 구호 저금통에 쏙 아낌없이 넣으니 마음 한편이 기분 좋게 뿌듯해요." },
+            { word: "야속하다", cat: "angry", emoji: "🥺", face: "angry", def: "믿었던 사람이나 짝꿍이 내 절실한 부탁을 매몰차게 거절하거나 모르는 척하여 한편으로 서운하고 미운 느낌이에요.", ex: "내가 다쳐서 짐을 좀 나눠 들어달라고 부탁했는데, 귀찮다는 표정으로 모른 척 쌩 가 버리는 친구가 야속했어요." },
+            { word: "짜증스럽다", cat: "angry", emoji: "⚡", face: "angry", def: "일이 잘 마음대로 되지 않고 자꾸 거슬리는 게 생겨 신경질이 조금씩 불쑥 솟아오르는 불유쾌한 기분이에요.", ex: "동생이 숙제하는 내 주변에서 큰 볼륨으로 장난감 마이크에 대고 시끄럽게 소리치며 장난을 치자 짜증스러웠어요." },
+            { word: "찝찝하다", cat: "confused", emoji: "🥴", face: "bored", def: "무언가 마무리가 영 어설프고, 꺼림칙한 마음의 매듭이 그대로 남아 계속 머릿속에 맴도는 개운하지 않은 기분이에요.", ex: "시험을 다 치고 나왔는데, 4번과 5번 문제 두 개의 정답 마킹을 잘 옮겨 적었는지 왠지 계속 찝찝했어요." },
+            { word: "초조하다", cat: "scared", emoji: "⏳", face: "scared", def: "중요한 순간이나 마감이 한시바삐 째깍째깍 다가오는데, 대책이 마땅치 않아 가슴을 쓸어안고 애타는 떨림이에요.", ex: "내 피아노 연주 독주 차례가 바로 1분 앞으로 훌쩍 다가왔을 때, 손가락 끝이 굳고 심장이 초조하게 뛰었어요." },
+            { word: "행복하다", cat: "joy", emoji: "🌈", face: "happy", def: "내 가슴에 더는 아무 바랄 것이 없을 만큼 마음 가득 풍족한 사랑과 평온, 넘치는 기쁨이 머무는 행복한 모습이에요.", ex: "휴일 저녁에 온 가족이 둥글게 모여 앉아 좋아하는 달콤한 고구마를 구워 나누어 먹을 때가 가장 행복해요." },
+            { word: "후련하다", cat: "joy", emoji: "🎈", face: "happy", def: "그동안 나를 줄곧 억누르던 큰 걱정이나 힘겨운 과제 숙제를 다 마쳐서 아주 시원하고 날아갈 듯 가벼워진 마음이에요.", ex: "드디어 며칠 동안 애태우며 연습해 오던 독도 골든벨 골든 퀴즈 대회를 끝내고 나니 마음이 훌쩍 후련해요." },
+            { word: "찡하다", cat: "love", emoji: "🥺", face: "happy-tear", def: "책이나 영화, 가족들의 고백 등을 통해 감동의 물결이 가슴 깊이 파고들어 코끝이 맹꽁 시큰해지는 상태예요.", ex: "나의 생일을 기념하여 부모님께서 나를 칭찬해 주는 두꺼운 손 편지를 읽는 중에 가슴 깊은 곳이 찡해졌어요." },
+            { word: "통쾌하다", cat: "joy", emoji: "💥", face: "happy", def: "답답하고 막혔던 체증이 한 번에 뻥 뚫리듯이 시원스럽고 엄청나게 속이 유쾌해지는 기분이에요.", ex: "축구 시합 중 0대0으로 비기고 있다가 인저리 타임에 동생이 시원한 중거리 슛 골을 넣어서 통쾌했어요." },
+            { word: "허무하다", cat: "sad", emoji: "💨", face: "bored", def: "많은 노력을 들여 준비했으나 아무 소용 없이 공중분해되거나 무너져 보람 없이 텅 비고 헛된 느낌이에요.", ex: "모래사장에서 세 시간을 걸쳐 멋진 바다 성곽을 지었는데, 거센 한 번의 파도가 쓸어 가 버려 허무했어요." },
+            { word: "훈훈하다", cat: "love", emoji: "🔥", face: "love", def: "주변의 따뜻한 정이나 훈훈한 배려 소식을 접하고, 내 가슴속마저 아주 따스하게 불을 피워 올리는 상태예요.", ex: "추운 칼바람이 부는 야외 정류장에서 서로 따끈한 손난로를 빌려주며 기다리는 이웃들의 온기가 훈훈했어요." },
+            { word: "창피하다", cat: "confused", emoji: "🙈", face: "shocked", def: "남들 앞에서 엉뚱한 실수를 저지르거나 들켜서 쥐구멍에라도 숨고 싶고 얼굴이 붉어지며 민망한 상태예요.", ex: "점심시간 급식실 앞에서 미끄러운 바닥에 꽈당 크게 넘어져 식판을 다 엎질렀을 때 참 부끄럽고 창피했어요." },
+            { word: "편안하다", cat: "joy", emoji: "🛋️", face: "happy", def: "몸과 마음에 아무런 불편이나 뾰족함 없이 넓고 푹신한 쇼파에 기댄 듯 한없이 평화롭고 안락한 상태예요.", ex: "주말 아침, 따뜻한 솜이불 속을 파고 들어가 조용한 라디오 피아노 선율을 누워서 가만 들으니 참 편안해요." },
+            { word: "허전하다", cat: "sad", emoji: "🍂", face: "sad", def: "내 곁에 오랫동안 존재했던 소중한 가방, 인형, 혹은 친구가 비어있어서 마음속에 둥그런 구멍이 난 듯 쓸쓸함이에요.", ex: "늘 내 필통을 채워주던 단짝 짝꿍 친구가 오늘 멀리 해외로 떠나간 빈 책상을 가만히 바라보고 있으니 허전해요." },
+            { word: "흐뭇하다", cat: "joy", emoji: "☺️", face: "happy", def: "상황이나 내 행동의 결실이 마음에 쏙 만족스럽게 흡족하여 나도 모르게 입꼬리가 씨익 올라가는 기분이에요.", ex: "내가 열심히 쓰고 다듬은 일기장에 선생님이 빨간 펜으로 하트 도장 세 개를 정성껏 찍어주셔서 무척 흐뭇했어요." },
+            { word: "철렁하다", cat: "scared", emoji: "⚡", face: "shocked", def: "갑작스러운 사고나 어마어마한 나쁜 소식 때문에 심장이 아래로 뚝 떨어지고 온몸이 아찔해지는 기분이에요.", ex: "뒤에서 갑자기 차가 클락션을 '빵!' 하고 크게 울리며 길모퉁이를 돌 때 가슴 한구석이 아주 철렁했어요." },
+            { word: "평화롭다", cat: "joy", emoji: "🕊️", face: "happy", def: "다툼이나 싸움의 그늘이 전혀 없이 드넓은 들판과 강물처럼 잔잔하고 고요해서 참 포근한 안식의 모습이에요.", ex: "바람에 풀잎이 흔들리는 숲길 벤치에 가만히 누워 하늘을 떠가는 양떼구름을 바라보고 있으니 무척 평화로워요." },
+            { word: "화나다", cat: "angry", emoji: "😡", face: "angry", def: "불의의 오해나 부당한 장난, 억울함을 겪어 가슴 깊은 곳에서 뜨거운 불길이 활활 뿜어져 나오는 성난 기분이에요.", ex: "내가 이틀에 걸쳐 완성한 종이 접기 궁전을 내 동생이 소중함도 모르고 마구 짓밟아 찢어놨을 때 크게 화가 났어요." }
+        ];
+
+        // Active State Variables
+        let activeWord = null;
+        let selectedCategory = 'all';
+        let savedWorksheets = [];
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            // Populate the Word Cards Grid
+            renderWords();
+            // Automatically capture the current published/running page URL for students
+            initQrCode();
+            // Draw default character Maumi
+            drawCharacter('neutral');
+        }
+
+        // Render emotional word cards based on filters (search was removed for ultimate simplicity!)
+        function renderWords() {
+            const grid = document.getElementById('wordGrid');
+            grid.innerHTML = '';
+
+            let count = 0;
+            EMOTION_DICTIONARY.forEach((item) => {
+                // Check Category Filter Only
+                const matchesCat = (selectedCategory === 'all' || item.cat === selectedCategory);
+
+                if (matchesCat) {
+                    count++;
+                    const btn = document.createElement('button');
+                    // Style by Category for playful variety
+                    let themeClass = "bg-white border-slate-200 hover:border-sky-400 hover:bg-sky-50 text-slate-700";
+                    if (item.cat === 'joy') themeClass = "bg-emerald-50/70 border-emerald-100 hover:border-emerald-400 hover:bg-emerald-50 text-emerald-800";
+                    else if (item.cat === 'sad') themeClass = "bg-blue-50/70 border-blue-100 hover:border-blue-400 hover:bg-blue-50 text-blue-800";
+                    else if (item.cat === 'angry') themeClass = "bg-rose-50/70 border-rose-100 hover:border-rose-400 hover:bg-rose-50 text-rose-800";
+                    else if (item.cat === 'scared') themeClass = "bg-amber-50/70 border-amber-100 hover:border-amber-400 hover:bg-amber-50 text-amber-800";
+                    else if (item.cat === 'love') themeClass = "bg-pink-50/70 border-pink-100 hover:border-pink-400 hover:bg-pink-50 text-pink-800";
+                    else if (item.cat === 'confused') themeClass = "bg-purple-50/70 border-purple-100 hover:border-purple-400 hover:bg-purple-50 text-purple-800";
+
+                    btn.className = `${themeClass} border-2 rounded-2xl p-4 font-black text-sm sm:text-base md:text-lg transition-all transform hover:scale-105 active:scale-95 flex items-center justify-between gap-1 shadow-sm min-h-[58px]`;
+                    btn.setAttribute('onclick', `selectWord('${item.word}')`);
+                    
+                    btn.innerHTML = `
+                        <span>${item.word}</span>
+                        <span class="text-xl sm:text-2xl">${item.emoji}</span>
+                    `;
+                    grid.appendChild(btn);
+                }
+            });
+
+            document.getElementById('word-count').innerText = count;
+        }
+
+        // Filter elements by Category selection
+        function filterCategory(cat) {
+            selectedCategory = cat;
+            
+            // Toggle active design styles on buttons
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-sky-500', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-700');
+            });
+            
+            const activeBtn = document.getElementById(`cat-${cat}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-slate-700');
+                // Color match active states
+                if (cat === 'all') activeBtn.classList.add('bg-sky-500', 'text-white');
+                else if (cat === 'joy') activeBtn.classList.add('bg-emerald-500', 'text-white');
+                else if (cat === 'sad') activeBtn.classList.add('bg-blue-500', 'text-white');
+                else if (cat === 'angry') activeBtn.classList.add('bg-rose-500', 'text-white');
+                else if (cat === 'scared') activeBtn.classList.add('bg-amber-500', 'text-white');
+                else if (cat === 'love') activeBtn.classList.add('bg-pink-500', 'text-white');
+                else if (cat === 'confused') activeBtn.classList.add('bg-purple-500', 'text-white');
+            }
+
+            renderWords();
+        }
+
+        function resetFilters() {
+            filterCategory('all');
+        }
+
+        // Select an emotion word and trigger visual speech bubble update
+        function selectWord(wordName) {
+            const entry = EMOTION_DICTIONARY.find(item => item.word === wordName);
+            if (!entry) return;
+
+            activeWord = entry;
+
+            // Update Speech Bubble Text
+            document.getElementById('bubbleWord').innerText = entry.word;
+            document.getElementById('bubbleEmoji').innerText = entry.emoji;
+            document.getElementById('bubbleDefinition').innerText = entry.def;
+            document.getElementById('bubbleExample').innerText = `"${entry.ex}"`;
+
+            // Auto fill worksheet suggestion
+            document.getElementById('wsWord').value = entry.word;
+
+            // Trigger Maumi expression based on category
+            let moodLabel = "평온";
+            if (entry.cat === 'joy') {
+                drawCharacter('happy');
+                moodLabel = "기쁨/든든";
+            } else if (entry.cat === 'sad') {
+                drawCharacter('sad');
+                moodLabel = "슬픔/울적";
+            } else if (entry.cat === 'angry') {
+                drawCharacter('angry');
+                moodLabel = "속상/화남";
+            } else if (entry.cat === 'scared') {
+                drawCharacter('scared');
+                moodLabel = "불안/두렴";
+            } else if (entry.cat === 'love') {
+                drawCharacter('love');
+                moodLabel = "행복/사랑";
+            } else {
+                drawCharacter('shocked');
+                moodLabel = "알쏭달쏭";
+            }
+            document.getElementById('characterLabel').innerText = `마음이의 기분: ${moodLabel}`;
+
+            // Play TTS on select automatically
+            readAloudActiveWord();
+        }
+
+        // Text to Speech integration
+        function readAloudActiveWord() {
+            if (!activeWord) {
+                speakText("안녕! 몽글몽글 마음 사전에 온 걸 환영해! 배우고 싶은 감정 단어의 버튼을 꾹 눌러봐!");
+                return;
+            }
+            const speechText = `${activeWord.word}. ${activeWord.def} 예시 문장. ${activeWord.ex}`;
+            speakText(speechText);
+        }
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) {
+                console.warn("이 브라우저는 목소리 읽기 기능을 지원하지 않아요.");
+                return;
+            }
+            // Stop active speech first
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            utterance.rate = 1.05; // Friendly kids reading speed
+            utterance.pitch = 1.25; // Cheerful bright child tone
+            
+            // Change volume speaker animation style briefly
+            const btn = document.getElementById('speakerBtn');
+            btn.classList.add('animate-bounce');
+            setTimeout(() => btn.classList.remove('animate-bounce'), 800);
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Dynamic Character Drawing SVG Engine
+        function drawCharacter(mood) {
+            const container = document.getElementById('characterWrapper');
+            let faceSvg = '';
+
+            const baseBody = `
+                <circle cx="50" cy="50" r="45" fill="url(#gradMaumi)" filter="url(#shadow)" />
+                <defs>
+                    <linearGradient id="gradMaumi" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#fdba74" />
+                        <stop offset="100%" stop-color="#f43f5e" />
+                    </linearGradient>
+                    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#f43f5e" flood-opacity="0.3"/>
+                    </filter>
+                </defs>
+            `;
+
+            switch(mood) {
+                case 'happy':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            ${baseBody}
+                            <!-- Eyes (Smiling arches) -->
+                            <path d="M 30 45 Q 40 33 50 45" stroke="#4c0519" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                            <path d="M 60 45 Q 70 33 80 45" stroke="#4c0519" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                            <!-- Rosy Cheeks -->
+                            <circle cx="28" cy="55" r="7" fill="#f43f5e" opacity="0.5"/>
+                            <circle cx="72" cy="55" r="7" fill="#f43f5e" opacity="0.5"/>
+                            <!-- Happy Mouth -->
+                            <path d="M 38 60 Q 50 78 62 60" stroke="#4c0519" stroke-width="4.5" fill="#f43f5e" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                    break;
+                case 'happy-tear':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            ${baseBody}
+                            <!-- Eyes -->
+                            <path d="M 30 45 Q 40 33 50 45" stroke="#4c0519" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                            <path d="M 60 45 Q 70 33 80 45" stroke="#4c0519" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                            <!-- Tear drops -->
+                            <path d="M 33 46 Q 30 55 35 55 Q 40 55 37 46 Z" fill="#38bdf8"/>
+                            <path d="M 73 46 Q 70 55 75 55 Q 80 55 77 46 Z" fill="#38bdf8"/>
+                            <!-- Happy Mouth -->
+                            <path d="M 38 60 Q 50 78 62 60" stroke="#4c0519" stroke-width="4.5" fill="#f43f5e" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                    break;
+                case 'sad':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="45" fill="url(#gradSad)" filter="url(#sadShadow)" />
+                            <defs>
+                                <linearGradient id="gradSad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#93c5fd" />
+                                    <stop offset="100%" stop-color="#3b82f6" />
+                                </linearGradient>
+                                <filter id="sadShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#3b82f6" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <!-- Sad Slanted Eyes -->
+                            <path d="M 28 40 L 42 46" stroke="#1e3a8a" stroke-width="4.5" stroke-linecap="round"/>
+                            <path d="M 72 40 L 58 46" stroke="#1e3a8a" stroke-width="4.5" stroke-linecap="round"/>
+                            <circle cx="35" cy="49" r="3.5" fill="#1e3a8a"/>
+                            <circle cx="65" cy="49" r="3.5" fill="#1e3a8a"/>
+                            <!-- Crying Tear -->
+                            <path d="M 32 50 Q 28 65 34 65 Q 40 65 36 50 Z" fill="#e0f2fe"/>
+                            <!-- Sad Downward Curve Mouth -->
+                            <path d="M 40 70 Q 50 58 60 70" stroke="#1e3a8a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                    break;
+                case 'angry':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="45" fill="url(#gradAngry)" filter="url(#angryShadow)" />
+                            <defs>
+                                <linearGradient id="gradAngry" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fca5a5" />
+                                    <stop offset="100%" stop-color="#ef4444" />
+                                </linearGradient>
+                                <filter id="angryShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#ef4444" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <!-- Angry eyebrows pointing in -->
+                            <path d="M 25 36 L 43 44" stroke="#450a0a" stroke-width="5" stroke-linecap="round"/>
+                            <path d="M 75 36 L 57 44" stroke="#450a0a" stroke-width="5" stroke-linecap="round"/>
+                            <!-- Eyes -->
+                            <circle cx="34" cy="48" r="4" fill="#450a0a"/>
+                            <circle cx="66" cy="48" r="4" fill="#450a0a"/>
+                            <!-- Steam lines -->
+                            <path d="M 18 20 Q 22 15 20 10" stroke="#fca5a5" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <path d="M 82 20 Q 86 15 84 10" stroke="#fca5a5" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <!-- Grumpy flat or wave mouth -->
+                            <path d="M 36 66 Q 50 58 64 66" stroke="#450a0a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                    break;
+                case 'scared':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="45" fill="url(#gradScared)" filter="url(#scaredShadow)" />
+                            <defs>
+                                <linearGradient id="gradScared" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fde047" />
+                                    <stop offset="100%" stop-color="#ca8a04" />
+                                </linearGradient>
+                                <filter id="scaredShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#ca8a04" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <!-- High eyebrows -->
+                            <path d="M 28 35 Q 35 28 42 35" stroke="#422006" stroke-width="3.5" fill="none"/>
+                            <path d="M 58 35 Q 65 28 72 35" stroke="#422006" stroke-width="3.5" fill="none"/>
+                            <!-- Wide startled eyes -->
+                            <circle cx="35" cy="47" r="5" fill="#422006"/>
+                            <circle cx="65" cy="47" r="5" fill="#422006"/>
+                            <circle cx="34" cy="45" r="1.5" fill="white"/>
+                            <circle cx="64" cy="45" r="1.5" fill="white"/>
+                            <!-- Quivering mouth -->
+                            <path d="M 35 68 Q 42 62 50 68 Q 58 62 65 68" stroke="#422006" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                    break;
+                case 'love':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="45" fill="url(#gradLove)" filter="url(#loveShadow)" />
+                            <defs>
+                                <linearGradient id="gradLove" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fbcfe8" />
+                                    <stop offset="100%" stop-color="#ec4899" />
+                                </linearGradient>
+                                <filter id="loveShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#ec4899" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <!-- Heart Eyes -->
+                            <path d="M 22 45 Q 22 35 30 35 Q 38 35 38 45 Q 38 53 30 60 Q 22 53 22 45 Z" fill="#9d174d"/>
+                            <path d="M 62 45 Q 62 35 70 35 Q 78 35 78 45 Q 78 53 70 60 Q 62 53 62 45 Z" fill="#9d174d"/>
+                            <!-- Cheek Blush -->
+                            <ellipse cx="25" cy="58" rx="5" ry="3" fill="#ec4899" opacity="0.6"/>
+                            <ellipse cx="75" cy="58" rx="5" ry="3" fill="#ec4899" opacity="0.6"/>
+                            <!-- Sweet Smile -->
+                            <path d="M 42 65 Q 50 75 58 65" stroke="#9d174d" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    `;
+                    break;
+                case 'shocked':
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="45" fill="url(#gradShocked)" filter="url(#shockShadow)" />
+                            <defs>
+                                <linearGradient id="gradShocked" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#e9d5ff" />
+                                    <stop offset="100%" stop-color="#a855f7" />
+                                </linearGradient>
+                                <filter id="shockShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#a855f7" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <!-- Tilted eyebrows -->
+                            <path d="M 26 33 L 40 37" stroke="#3b0764" stroke-width="3.5" stroke-linecap="round"/>
+                            <path d="M 74 33 L 60 37" stroke="#3b0764" stroke-width="3.5" stroke-linecap="round"/>
+                            <!-- Wide open round eyes -->
+                            <circle cx="34" cy="47" r="6" fill="#3b0764"/>
+                            <circle cx="66" cy="47" r="6" fill="#3b0764"/>
+                            <circle cx="34" cy="47" r="2" fill="white"/>
+                            <circle cx="66" cy="47" r="2" fill="white"/>
+                            <!-- Small round O mouth -->
+                            <circle cx="50" cy="68" r="6" fill="#3b0764"/>
+                        </svg>
+                    `;
+                    break;
+                case 'bored':
+                default:
+                    faceSvg = `
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="50" cy="50" r="45" fill="url(#gradNeutral)" filter="url(#neutralShadow)" />
+                            <defs>
+                                <linearGradient id="gradNeutral" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#e2e8f0" />
+                                    <stop offset="100%" stop-color="#94a3b8" />
+                                </linearGradient>
+                                <filter id="neutralShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#94a3b8" flood-opacity="0.3"/>
+                                </filter>
+                            </defs>
+                            <!-- Half open bored eyes -->
+                            <path d="M 25 43 L 41 43" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M 59 43 L 75 43" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+                            <circle cx="33" cy="50" r="3.5" fill="#1e293b"/>
+                            <circle cx="67" cy="50" r="3.5" fill="#1e293b"/>
+                            <!-- Flat straight mouth -->
+                            <line x1="38" y1="66" x2="62" y2="66" stroke="#1e293b" stroke-width="4.5" stroke-linecap="round" />
+                        </svg>
+                    `;
+            }
+
+            container.innerHTML = faceSvg;
+        }
+
+        // Save current worksheet card input to student collection list
+        function saveToWorksheet() {
+            const word = document.getElementById('wsWord').value;
+            const reason = document.getElementById('wsReason').value.trim();
+            const customEx = document.getElementById('wsExample').value.trim();
+
+            if (!word) {
+                showSuccessBanner("⚠️ 아래 단어 사전 중에서 먼저 하나를 골라 클릭해 줘!");
+                return;
+            }
+            if (!reason) {
+                showSuccessBanner("⚠️ 이 감정을 언제 느껴보았는지 너만의 생각을 적어줘!");
+                return;
+            }
+            if (!customEx) {
+                showSuccessBanner("⚠️ 이 단어를 사용해 짧고 멋진 문장 하나를 지어줘!");
+                return;
+            }
+
+            // Check if already exists in worksheet
+            if (savedWorksheets.some(item => item.word === word)) {
+                // Remove the old entry to overwrite gracefully
+                savedWorksheets = savedWorksheets.filter(item => item.word !== word);
+            }
+
+            // Push to state
+            savedWorksheets.push({ word, reason, customEx });
+
+            // Reset Input areas
+            document.getElementById('wsReason').value = '';
+            document.getElementById('wsExample').value = '';
+
+            // Update UI
+            updateWorksheetUI();
+            
+            // Success sound / visual banner
+            showSuccessBanner(`✨ '${word}' 감정이 내 마음 학습지에 잘 들어갔어요!`);
+        }
+
+        // Show child-friendly modal success banner
+        function showSuccessBanner(msg) {
+            const oldBanner = document.getElementById('successBanner');
+            if (oldBanner) oldBanner.remove();
+
+            const banner = document.createElement('div');
+            banner.id = "successBanner";
+            banner.className = "fixed top-6 left-1/2 transform -translate-x-1/2 bg-slate-900/90 text-white font-bold px-6 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-2.5 transition-all duration-300 transform translate-y-[-20px] opacity-0 text-sm sm:text-base border border-slate-700/50 backdrop-blur-md";
+            banner.innerHTML = `<span class="text-xl">🌟</span> <span class="tracking-wide">${msg}</span>`;
+            document.body.appendChild(banner);
+            
+            setTimeout(() => {
+                banner.classList.remove('translate-y-[-20px]', 'opacity-0');
+                banner.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+
+            setTimeout(() => {
+                banner.classList.add('translate-y-[-20px]', 'opacity-0');
+                setTimeout(() => banner.remove(), 300);
+            }, 3000);
+        }
+
+        function clearWorksheet() {
+            document.getElementById('wsReason').value = '';
+            document.getElementById('wsExample').value = '';
+            savedWorksheets = [];
+            updateWorksheetUI();
+            showSuccessBanner("♻️ 학습지에 쓴 내용들이 깨끗하게 지워졌어요.");
+        }
+
+        // Update the Floating Bar and Printable Content Container
+        function updateWorksheetUI() {
+            const bar = document.getElementById('worksheetBar');
+            const countSpan = document.getElementById('savedCount');
+            const printList = document.getElementById('printWordsList');
+
+            countSpan.innerText = savedWorksheets.length;
+
+            if (savedWorksheets.length > 0) {
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+
+            // Update Print-Only View Elements
+            if (savedWorksheets.length === 0) {
+                printList.innerHTML = `
+                    <div class="text-center text-slate-400 py-10 font-bold border border-dashed border-slate-300 rounded-xl">
+                        오른쪽 패널에서 "활동지에 추가" 버튼을 눌러 단어를 기록해 주세요!
+                    </div>
+                `;
+            } else {
+                printList.innerHTML = '';
+                savedWorksheets.forEach((item, index) => {
+                    const originalEntry = EMOTION_DICTIONARY.find(e => e.word === item.word);
+                    const originalDef = originalEntry ? originalEntry.def : '';
+
+                    const card = document.createElement('div');
+                    card.className = "border border-slate-300 p-5 rounded-2xl flex flex-col gap-3 bg-white";
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <h3 class="text-xl font-bold text-indigo-700">
+                                <span class="text-slate-400 text-sm mr-1">#${index + 1}</span>
+                                <span>${item.word}</span>
+                                <span class="text-base">${originalEntry ? originalEntry.emoji : '🎈'}</span>
+                            </h3>
+                            <span class="text-xs text-slate-400">사전 뜻: ${originalDef}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-1">
+                            <div class="bg-indigo-50/50 p-3 rounded-xl">
+                                <strong class="text-xs text-indigo-600 block mb-1">💡 내가 이 감정을 느꼈을 때:</strong>
+                                <p class="text-slate-700 font-medium">${item.reason}</p>
+                            </div>
+                            <div class="bg-emerald-50/50 p-3 rounded-xl">
+                                <strong class="text-xs text-emerald-600 block mb-1">✍️ 내가 만든 예쁜 예문:</strong>
+                                <p class="text-slate-700 italic font-medium">"${item.customEx}"</p>
+                            </div>
+                        </div>
+                    `;
+                    printList.appendChild(card);
+                });
+            }
+        }
+
+        // Trigger safe print screen render
+        function previewAndPrint() {
+            window.print();
+        }
+
+        // Automatically determine local/published URL to feed to the QR API
+        function initQrCode() {
+            // Read current browser URL (it will automatically adjust whether local file, school LMS, or public hosting is used)
+            let currentUrl = window.location.href;
+            
+            // Update input box value
+            document.getElementById('qrCustomUrl').value = currentUrl;
+            
+            // Build and display QR
+            updateQrCode();
+        }
+
+        function updateQrCode() {
+            let targetUrl = document.getElementById('qrCustomUrl').value.trim();
+            if (!targetUrl) {
+                targetUrl = window.location.href;
+            }
+            
+            // Generate QR Code through dynamic public secure API
+            const qrImg = document.getElementById('qrImage');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(targetUrl)}`;
+        }
+
+        // Copy input link utility
+        function copyCurrentUrl() {
+            const customUrlInput = document.getElementById('qrCustomUrl');
+            customUrlInput.select();
+            
+            try {
+                document.execCommand('copy');
+                showSuccessBanner("📋 학생들이 이용할 주소가 클립보드에 무사히 복사되었습니다!");
+            } catch (err) {
+                console.error("클립보드 복사 실패:", err);
+            }
+        }
+
+        // Modal opening/closing animations triggers
+        function openQrModal() {
+            const modal = document.getElementById('qrModal');
+            // Recalculate to ensure accurate URL gets loaded
+            initQrCode();
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+        }
+
+        function closeQrModal() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('scale-95');
+        }
+
+        function openHelpModal() {
+            const modal = document.getElementById('helpModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+        }
+
+        function closeHelpModal() {
+            const modal = document.getElementById('helpModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('scale-95');
+        }
+
+        function openAppGuideModal() {
+            const modal = document.getElementById('appGuideModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+        }
+
+        function closeAppGuideModal() {
+            const modal = document.getElementById('appGuideModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('scale-95');
+        }
+    </script>
+</body>
+</html>
